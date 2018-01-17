@@ -66,7 +66,6 @@ public class RegisterActivity extends AppCompatActivity implements SensorEventLi
         //Get sensor
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-        sensorManager.unregisterListener(this);
     }
 
     private void welcome(String username){
