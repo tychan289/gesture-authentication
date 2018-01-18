@@ -25,7 +25,7 @@ public class MainActivity extends AppCompatActivity {
     public void onClickBtn(View view){
         String username = editText.getText().toString();
 
-        //Check if registered then open activity_login
+        //Check if registered then open activity_register
         if (true) {
             Intent intent = new Intent(this, RegisterActivity.class);
             intent.putExtra("username", username);

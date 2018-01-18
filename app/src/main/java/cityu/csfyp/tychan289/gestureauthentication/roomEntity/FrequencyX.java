@@ -9,19 +9,7 @@ import android.arch.persistence.room.PrimaryKey;
  */
 
 @Entity(indices = {@Index(value = {"username"}, unique = true)})
-public class FrequencyX {
+public class FrequencyX extends Frequency{
     @PrimaryKey
     public int id;
-
-    public String username;
-    public int class_0;
-    public int class_1;
-    public int class_2;
-    public int class_3;
-    public int class_4;
-    public int class_5;
-    public int class_6;
-    public int class_7;
-    public int class_8;
-    public int class_9;
 }

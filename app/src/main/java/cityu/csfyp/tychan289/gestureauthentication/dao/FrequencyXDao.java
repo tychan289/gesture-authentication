@@ -14,7 +14,7 @@ import cityu.csfyp.tychan289.gestureauthentication.roomEntity.FrequencyX;
  */
 
 @Dao
-public interface XDao {
+public interface FrequencyXDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     public void insert(FrequencyX object);
 

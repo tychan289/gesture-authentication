@@ -16,6 +16,8 @@ import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import cityu.csfyp.tychan289.gestureauthentication.roomEntity.Frequency;
+
 public class RegisterActivity extends AppCompatActivity implements SensorEventListener {
 
     //Sensor
@@ -30,35 +32,29 @@ public class RegisterActivity extends AppCompatActivity implements SensorEventLi
     String username;
     private double gravity[] = new double[3];
     private double linear_acceleration[] = new double[3];
-    private boolean sensorOn = true;
-    private boolean start = true;
     private boolean timerRunning = false;
-    private double max_x = 0;
-    private double max_y = 0;
-    private double max_z = 0;
-    private double min_x = 0;
-    private double min_y = 0;
-    private double min_z = 0;
-    private ArrayList data = new ArrayList();
+    private ArrayList data_x = new ArrayList();
+    private ArrayList data_y = new ArrayList();
+    private ArrayList data_z = new ArrayList();
     private int trial = 1;
+    private Frequency frequencyX = new Frequency();
+    private Frequency frequencyY = new Frequency();
+    private Frequency frequencyZ = new Frequency();
 
-    //range constant for defining class
-    private static final double upper_x = 2;
-    private static final double lower_x = -2;
-    private static final double upper_y = 2;
-    private static final double lower_y = -2;
-    private static final double upper_z = 2;
-    private static final double lower_z = -2;
+    //Constant
+    private static final char x_type = 'x';
+    private static final char y_type = 'y';
+    private static final char z_type = 'z';
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_login);
+        setContentView(R.layout.activity_register);
 
-        //Get views
+        //Get views of activity_register
         textView = (TextView) findViewById(R.id.welcome_textView);
 
-        //Change welcoming text
+        //Change welcoming text from intent
         Intent intent = getIntent();
         username = intent.getStringExtra("username");
         welcome(username);
@@ -68,15 +64,59 @@ public class RegisterActivity extends AppCompatActivity implements SensorEventLi
         accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
     }
 
-    private void welcome(String username){
-        textView.setText("Welcome " + username);
+    private void welcome(String username) {
+        textView.setText("Welcome \n" + username);
     }
 
-    @Override
-    public final void onAccuracyChanged(Sensor sensor, int accuracy) {
-        // Do something here if sensor accuracy changes.
+    //Toggle timer
+    public void toggleSensor(View v) {
+        //Need to limit the training time ...
+
+        if (timerRunning) {
+            stopTimer();
+        } else {
+            startTimer();
+        }
     }
 
+    //Timer to record the sensor data per 10ms
+    private void startTimer() {
+        timerRunning = true;
+
+        Log.i("TIMER", "Start recording accelerometer values");
+        timer = new Timer();
+        timer.schedule(new TimerTask() {
+            public void run() {
+                Log.i("ACCELEROMETER VALUES", linear_acceleration[0] + "," + linear_acceleration[1] + "," + linear_acceleration[2]);
+                data_x.add(linear_acceleration[0]);
+                data_y.add(linear_acceleration[1]);
+                data_z.add(linear_acceleration[2]);
+            }
+        }, 0, 10);
+    }
+
+    //Change data into frequency objects
+    private void stopTimer() {
+        timer.cancel();
+        timer.purge();
+        Log.i("TIMER", "Stop recording accelerometer values");
+
+        frequencyX = Classification.classify(data_x, x_type, frequencyX);
+        frequencyY = Classification.classify(data_y, y_type, frequencyY);
+        frequencyZ = Classification.classify(data_z, z_type, frequencyZ);
+        Log.i("TRIAL","Finished trial " + trial);
+
+        //Clear stored data
+        data_x.clear();
+        data_y.clear();
+        data_z.clear();
+
+        trial++;
+        timerRunning = false;
+    }
+
+    //Sensor is non-stop loading acceleration data
+    //Apply low-pass filter to filter the gravity
     @Override
     public final void onSensorChanged(SensorEvent event) {
         // alpha is calculated as t / (t + dT) = 0.05s / (0.05s + 0.01s)
@@ -92,9 +132,11 @@ public class RegisterActivity extends AppCompatActivity implements SensorEventLi
         linear_acceleration[0] = event.values[0] - gravity[0];
         linear_acceleration[1] = event.values[1] - gravity[1];
         linear_acceleration[2] = event.values[2] - gravity[2];
+    }
 
-        //Log.i("ACCELEROMETER VALUES", "x : " + linear_acceleration[0] + " , y : " + linear_acceleration[1] + " , z : " + linear_acceleration[2]);
-        //Log.i("ACCELEROMETER VALUES", linear_acceleration[0] + "," + linear_acceleration[1] + "," + linear_acceleration[2]);
+    /* Unused method */
+    @Override
+    public final void onAccuracyChanged(Sensor sensor, int accuracy) {
     }
 
     @Override
@@ -108,45 +150,5 @@ public class RegisterActivity extends AppCompatActivity implements SensorEventLi
         super.onPause();
         sensorManager.unregisterListener(this);
     }
-
-    public void toggleSensor(View v){
-        if (timerRunning){
-            stopTimer();
-        } else {
-            startTimer();
-        }
-    }
-
-    private void startTimer() {
-        timerRunning = true;
-        Log.i("TIMER","Start logging accelerometer values");
-        timer = new Timer();
-        timer.schedule(new TimerTask() {
-            public void run() {
-                Log.i("ACCELEROMETER VALUES", linear_acceleration[0] + "," + linear_acceleration[1] + "," + linear_acceleration[2]);
-                AccelerometerData accData = new AccelerometerData(linear_acceleration[0],linear_acceleration[1],linear_acceleration[2]);
-                data.add(accData);
-
-                // sx = (x + 2) / (2 + |-2|) * (4 / 20)
-                // sy = (y + 1) / (1 + |-1|) * (2 / 20)
-                // sz = (z + 1) / (1 + |-1|) * (2 / 20)
-                if (linear_acceleration[0] > max_x) {max_x = linear_acceleration[0];}
-                if (linear_acceleration[1] > max_y) {max_y = linear_acceleration[0];}
-                if (linear_acceleration[2] > max_z) {max_z = linear_acceleration[0];}
-
-                if (linear_acceleration[0] < min_x) {min_x = linear_acceleration[0];}
-                if (linear_acceleration[1] < min_y) {min_y = linear_acceleration[0];}
-                if (linear_acceleration[2] < min_z) {min_z = linear_acceleration[0];}
-            }
-        }, 0, 10);
-    }
-
-    private void stopTimer(){
-        timer.cancel();
-        timer.purge();
-        Log.i("ACCELEROMETER VALUES","Maximum: " + max_x + "," + max_y + "," + max_z);
-        Log.i("ACCELEROMETER VALUES","Minimum: " + min_x + "," + min_y + "," + min_z);
-        Log.i("TIMER","Stop logging accelerometer values");
-        timerRunning = false;
-    }
+    /* Unused method */
 }
