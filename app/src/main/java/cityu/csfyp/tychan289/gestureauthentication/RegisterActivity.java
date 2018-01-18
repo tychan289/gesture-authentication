@@ -37,14 +37,15 @@ public class RegisterActivity extends AppCompatActivity implements SensorEventLi
     private ArrayList data_y = new ArrayList();
     private ArrayList data_z = new ArrayList();
     private int trial = 1;
-    private Frequency frequencyX = new Frequency();
-    private Frequency frequencyY = new Frequency();
-    private Frequency frequencyZ = new Frequency();
+    private Frequency frequencyX, frequencyY, frequencyZ;
+    private Frequency frequencyA, frequencyB, frequencyC;
+    private Frequency resultX, resultY, resultZ;
 
     //Constant
     private static final char x_type = 'x';
     private static final char y_type = 'y';
     private static final char z_type = 'z';
+    private static final int trainingLimit = 2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,7 +71,10 @@ public class RegisterActivity extends AppCompatActivity implements SensorEventLi
 
     //Toggle timer
     public void toggleSensor(View v) {
-        //Need to limit the training time ...
+        //Finish training ...
+        if (trial >= trainingLimit){
+
+        }
 
         if (timerRunning) {
             stopTimer();
@@ -95,15 +99,31 @@ public class RegisterActivity extends AppCompatActivity implements SensorEventLi
         }, 0, 10);
     }
 
-    //Change data into frequency objects
+    //Stop recording data and turn data into frequency objects
     private void stopTimer() {
         timer.cancel();
         timer.purge();
         Log.i("TIMER", "Stop recording accelerometer values");
 
-        frequencyX = Classification.classify(data_x, x_type, frequencyX);
-        frequencyY = Classification.classify(data_y, y_type, frequencyY);
-        frequencyZ = Classification.classify(data_z, z_type, frequencyZ);
+        //Turn data into frequency objects
+        if (trial > trainingLimit){ //save if finish training
+            frequencyA = Classification.classify(data_x, x_type);
+            frequencyB = Classification.classify(data_y, y_type);
+            frequencyC = Classification.classify(data_z, z_type);
+
+            //PROBLEM BUGGGGG...........
+            resultX = Frequency.compare(frequencyA,frequencyX);
+            resultY = Frequency.compare(frequencyB,frequencyY);
+            resultZ = Frequency.compare(frequencyC,frequencyZ);
+        } else if (trial == 1){ //new if trial < 1
+            frequencyX = Classification.classify(data_x, x_type);
+            frequencyY = Classification.classify(data_y, y_type);
+            frequencyZ = Classification.classify(data_z, z_type);
+        } else if (trial > 1){ //average if trial > 1
+            frequencyX = Classification.classify(data_x, x_type, frequencyX);
+            frequencyY = Classification.classify(data_y, y_type, frequencyY);
+            frequencyZ = Classification.classify(data_z, z_type, frequencyZ);
+        }
         Log.i("TRIAL","Finished trial " + trial);
 
         //Clear stored data

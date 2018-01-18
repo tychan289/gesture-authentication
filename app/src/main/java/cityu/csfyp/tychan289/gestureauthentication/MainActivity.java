@@ -22,18 +22,16 @@ public class MainActivity extends AppCompatActivity {
         textView = (TextView) findViewById(R.id.remind_textView);
     }
 
-    public void onClickBtn(View view){
+    //Register (training)
+    public void onClickBtn(View view) {
         String username = editText.getText().toString();
 
-        //Check if registered then open activity_register
-        if (true) {
-            Intent intent = new Intent(this, RegisterActivity.class);
-            intent.putExtra("username", username);
-            startActivity(intent);
-        }
-
-        //Check if new user then open activity
-
-
+        //Send username into view
+        Intent intent = new Intent(this, RegisterActivity.class);
+        intent.putExtra("username", username);
+        startActivity(intent);
     }
+
+    //Login (testing)
+
 }

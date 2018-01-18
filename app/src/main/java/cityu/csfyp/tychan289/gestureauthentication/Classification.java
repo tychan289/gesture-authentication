@@ -17,53 +17,67 @@ public class Classification {
     private static final int lower_y = -2;
     private static final int upper_z = 2;
     private static final int lower_z = -2;
-    private static final int numOfClass = 10;
+    private static final int numOfClass = 15;
 
     public static Frequency classify(ArrayList<Double> list, char dataType) {
         Frequency object = new Frequency();
-        double temp = 0;
+        double temp;
         int segment = 0;
+        int range;
 
+        //s = (data + lower limit) / (range / numOfClass)
         switch (dataType) {
             case 'x':
+                range = upper_x + Math.abs(lower_x);
                 for (Double data : list) {
-                    temp = data + Math.abs(lower_x);
-                    temp = temp / (upper_x + Math.abs(lower_x));
-                    temp = temp / ((upper_x + Math.abs(lower_x)) / numOfClass);
-//                    temp = ((data + Math.abs(lower_x)) / (upper_x + Math.abs(lower_x))) / ((upper_x + Math.abs(lower_x)) / numOfClass);
-                    if (temp > upper_x) {
+                    temp = 0;
+                    temp = data + Math.abs(lower_x); //Shift lower limit to 0 from negative numbers
+                    temp = temp / range * numOfClass;
+
+                    if (temp > numOfClass) {
                         temp = numOfClass - 1;
                     }
-                    if (temp < lower_x) {
+                    if (temp < 0) {
                         temp = 0;
                     }
                     segment = (int) temp;
                     object.add(segment);
                 }
+                break;
             case 'y':
+                range = upper_y + Math.abs(lower_y);
                 for (Double data : list) {
-                    temp = ((data + Math.abs(lower_y)) / (upper_y + Math.abs(lower_y))) / ((upper_y + Math.abs(lower_y)) / numOfClass);
-                    if (temp > upper_y) {
+                    temp = 0;
+                    temp = data + Math.abs(lower_y); //Shift lower limit to 0 from negative numbers
+                    temp = temp / range * numOfClass;
+
+                    if (temp > numOfClass) {
                         temp = numOfClass - 1;
                     }
-                    if (temp < lower_y) {
+                    if (temp < 0) {
                         temp = 0;
                     }
                     segment = (int) temp;
                     object.add(segment);
                 }
+                break;
             case 'z':
+                range = upper_z + Math.abs(lower_z);
                 for (Double data : list) {
-                    temp = ((data + Math.abs(lower_y)) / (upper_z + Math.abs(lower_z))) / ((upper_z + Math.abs(lower_z)) / numOfClass);
-                    if (temp > upper_z) {
+                    temp = 0;
+                    temp = data + Math.abs(lower_z); //Shift lower limit to 0 from negative numbers
+                    temp = temp / range * numOfClass;
+
+                    if (temp > numOfClass) {
                         temp = numOfClass - 1;
                     }
-                    if (temp < lower_z) {
+                    if (temp < 0) {
                         temp = 0;
                     }
                     segment = (int) temp;
                     object.add(segment);
                 }
+                break;
         }
         return object;
     }
