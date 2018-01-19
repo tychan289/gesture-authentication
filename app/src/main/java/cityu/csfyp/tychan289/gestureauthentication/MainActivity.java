@@ -12,18 +12,17 @@ public class MainActivity extends AppCompatActivity {
 
     EditText editText;
     TextView textView;
-    Button button;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        editText = (EditText) findViewById(R.id.username_editText);
-        textView = (TextView) findViewById(R.id.remind_textView);
+        editText = (EditText) findViewById(R.id.main_username_input);
+        textView = (TextView) findViewById(R.id.main_instruction);
     }
 
     //Register (training)
-    public void onClickBtn(View view) {
+    public void register(View view) {
         String username = editText.getText().toString();
 
         //Send username into view
@@ -33,5 +32,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     //Login (testing)
+    public void login(View view){
+        String username = editText.getText().toString();
 
+        //Send username into view
+        Intent intent = new Intent(this, LoginActivity.class);
+        intent.putExtra("username", username);
+        startActivity(intent);
+    }
 }

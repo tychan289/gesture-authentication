@@ -17,7 +17,7 @@ public class Classification {
     private static final int lower_y = -2;
     private static final int upper_z = 2;
     private static final int lower_z = -2;
-    private static final int numOfClass = 15;
+    private static final int numOfClass = 20;
 
     public static Frequency classify(ArrayList<Double> list, char dataType) {
         Frequency object = new Frequency();

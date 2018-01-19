@@ -1,25 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="cityu.csfyp.tychan289.gestureauthentication.RegisterActivity"
-    tools:layout_editor_absoluteY="81dp">
-
-    <TextView
-        android:id="@+id/register_instruction4"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="32dp"
-        android:text="4. Repeat"
-        android:textAppearance="?android:textAppearanceLarge"
-        app:layout_constraintHorizontal_bias="0.506"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/instruction3" />
+    tools:context="cityu.csfyp.tychan289.gestureauthentication.RegisterActivity">
 
     <TextView
         android:id="@+id/instruction3"
@@ -80,7 +66,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <Button
-        android:id="@+id/register_toggle"
+        android:id="@+id/login_toggle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="32dp"
@@ -90,6 +76,6 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/register_instruction4" />
+        app:layout_constraintTop_toBottomOf="@+id/instruction3" />
 
 </android.support.constraint.ConstraintLayout>
