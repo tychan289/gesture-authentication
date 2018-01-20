@@ -3,6 +3,9 @@ package cityu.csfyp.tychan289.gestureauthentication;
 import java.util.ArrayList;
 
 import cityu.csfyp.tychan289.gestureauthentication.roomEntity.Frequency;
+import cityu.csfyp.tychan289.gestureauthentication.roomEntity.FrequencyX;
+import cityu.csfyp.tychan289.gestureauthentication.roomEntity.FrequencyY;
+import cityu.csfyp.tychan289.gestureauthentication.roomEntity.FrequencyZ;
 
 /**
  * Created by Moonviler on 18/1/18.
@@ -19,8 +22,7 @@ public class Classification {
     private static final int lower_z = -2;
     private static final int numOfClass = 20;
 
-    public static Frequency classify(ArrayList<Double> list, char dataType) {
-        Frequency object = new Frequency();
+    public static Frequency classify(ArrayList<Double> list, char dataType, String username) {
         double temp;
         int segment = 0;
         int range;
@@ -28,6 +30,7 @@ public class Classification {
         //s = (data + lower limit) / (range / numOfClass)
         switch (dataType) {
             case 'x':
+                FrequencyX fx = new FrequencyX();
                 range = upper_x + Math.abs(lower_x);
                 for (Double data : list) {
                     temp = 0;
@@ -41,10 +44,12 @@ public class Classification {
                         temp = 0;
                     }
                     segment = (int) temp;
-                    object.add(segment);
+                    fx.add(segment);
                 }
-                break;
+                fx.setUsername(username);
+                return fx;
             case 'y':
+                FrequencyY fy = new FrequencyY();
                 range = upper_y + Math.abs(lower_y);
                 for (Double data : list) {
                     temp = 0;
@@ -58,10 +63,12 @@ public class Classification {
                         temp = 0;
                     }
                     segment = (int) temp;
-                    object.add(segment);
+                    fy.add(segment);
                 }
-                break;
+                fy.setUsername(username);
+                return fy;
             case 'z':
+                FrequencyZ fz = new FrequencyZ();
                 range = upper_z + Math.abs(lower_z);
                 for (Double data : list) {
                     temp = 0;
@@ -75,16 +82,17 @@ public class Classification {
                         temp = 0;
                     }
                     segment = (int) temp;
-                    object.add(segment);
+                    fz.add(segment);
                 }
-                break;
+                fz.setUsername(username);
+                return fz;
         }
-        return object;
+        return new Frequency();
     }
 
-    public static Frequency classify(ArrayList<Double> list, char dataType, Frequency previous) {
-        Frequency object = classify(list, dataType);
-        object = Frequency.average(object, previous);
-        return object;
+    public static Frequency classify(ArrayList<Double> list, char dataType, String username, Frequency previous) {
+        Frequency f = classify(list, dataType, username);
+        f = Frequency.average(f, previous);
+        return f;
     }
 }

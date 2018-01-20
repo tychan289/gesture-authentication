@@ -18,10 +18,10 @@ import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import cityu.csfyp.tychan289.gestureauthentication.AppDatabase.XDatabase;
-import cityu.csfyp.tychan289.gestureauthentication.AppDatabase.YDatabase;
-import cityu.csfyp.tychan289.gestureauthentication.AppDatabase.ZDatabase;
-import cityu.csfyp.tychan289.gestureauthentication.roomEntity.Frequency;
+import cityu.csfyp.tychan289.gestureauthentication.AppDatabase.AppDatabase;
+import cityu.csfyp.tychan289.gestureauthentication.roomEntity.FrequencyX;
+import cityu.csfyp.tychan289.gestureauthentication.roomEntity.FrequencyY;
+import cityu.csfyp.tychan289.gestureauthentication.roomEntity.FrequencyZ;
 
 /**
  * Created by Moonviler on 19/1/18.
@@ -46,8 +46,9 @@ public class LoginActivity extends AppCompatActivity implements SensorEventListe
     private ArrayList data_x = new ArrayList();
     private ArrayList data_y = new ArrayList();
     private ArrayList data_z = new ArrayList();
-    private Frequency frequencyX, frequencyY, frequencyZ;
-    private Frequency frequencyA, frequencyB, frequencyC;
+    private FrequencyX frequencyX, frequencyA;
+    private FrequencyY frequencyY, frequencyB;
+    private FrequencyZ frequencyZ, frequencyC;
 
     //Constant
     private static final char x_type = 'x';
@@ -57,15 +58,7 @@ public class LoginActivity extends AppCompatActivity implements SensorEventListe
     private static final String stop = "STOP";
 
     //Database
-    XDatabase xdb = Room
-            .databaseBuilder(getApplicationContext(), XDatabase.class, "FrequencyX")
-            .build();
-    YDatabase ydb = Room
-            .databaseBuilder(getApplicationContext(), YDatabase.class, "FrequencyY")
-            .build();
-    ZDatabase zdb = Room
-            .databaseBuilder(getApplicationContext(), ZDatabase.class, "FrequencyZ")
-            .build();
+    AppDatabase db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,7 +67,7 @@ public class LoginActivity extends AppCompatActivity implements SensorEventListe
 
         //Get views of activity_register
         welcome_text = (TextView) findViewById(R.id.welcome);
-        toggle_button = (Button) findViewById(R.id.toggle_register_btn);
+        toggle_button = (Button) findViewById(R.id.login_toggle);
 
         //Change welcoming text from intent
         Intent intent = getIntent();
@@ -84,6 +77,13 @@ public class LoginActivity extends AppCompatActivity implements SensorEventListe
         //Get sensor
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+
+        //Get DB
+        db = providesAppDatabase();
+    }
+
+    private AppDatabase providesAppDatabase() {
+        return Room.databaseBuilder(getApplicationContext(), AppDatabase.class, "database").build();
     }
 
     private void welcome(String username) {
@@ -124,15 +124,16 @@ public class LoginActivity extends AppCompatActivity implements SensorEventListe
         Log.i("TIMER", "Stop recording accelerometer values");
 
         //Turn testing data into frequency objects
-        frequencyA = Classification.classify(data_x, x_type);
-        frequencyB = Classification.classify(data_y, y_type);
-        frequencyC = Classification.classify(data_z, z_type);
+        frequencyA = (FrequencyX) Classification.classify(data_x, x_type, username);
+        frequencyB = (FrequencyY) Classification.classify(data_y, y_type, username);
+        frequencyC = (FrequencyZ) Classification.classify(data_z, z_type, username);
 
         //Get stored object
-        frequencyX = xdb.frequencyXDao().getFrequencyX(username);
-        frequencyY = ydb.frequencyYDao().getFrequencyY(username);
-        frequencyZ = zdb.frequencyZDao().getFrequencyZ(username);
+        frequencyX = db.frequencyXDao().getFrequencyX(username);
+        frequencyY = db.frequencyYDao().getFrequencyY(username);
+        frequencyZ = db.frequencyZDao().getFrequencyZ(username);
 
+        //TODO: Implements comparing method
         //Compare data with stored one
 //        resultX = Frequency.compare(frequencyA, frequencyX);
 //        resultY = Frequency.compare(frequencyB, frequencyY);

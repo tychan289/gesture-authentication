@@ -10,6 +10,6 @@ import android.arch.persistence.room.PrimaryKey;
 
 @Entity(indices = {@Index(value = {"username"}, unique = true)})
 public class FrequencyZ extends Frequency{
-    @PrimaryKey
+    @PrimaryKey(autoGenerate = true)
     public int id;
 }

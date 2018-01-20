@@ -16,6 +16,16 @@ public class Frequency {
         class_7 = 0;
         class_8 = 0;
         class_9 = 0;
+        class_10 = 0;
+        class_11 = 0;
+        class_12 = 0;
+        class_13 = 0;
+        class_14 = 0;
+        class_15 = 0;
+        class_16 = 0;
+        class_17 = 0;
+        class_18 = 0;
+        class_19 = 0;
     }
 
     private static final double constant = 1;
@@ -156,6 +166,8 @@ public class Frequency {
         return f;
     }
 
+    //TODO: Revise comparing method from chi-square-test
+    //Cannot fit when expected value = 0
     public static int chi_square_test(Frequency template, Frequency test) {
         int x = 0;
         int temp;
@@ -163,7 +175,7 @@ public class Frequency {
         if (template.class_0 != 0) {
             temp = Math.abs(template.class_0 - test.class_0) * Math.abs(template.class_0 - test.class_0) / template.class_0;
         } else {
-            temp = (int)(Math.abs(template.class_0 - test.class_0) * Math.abs(template.class_0 - test.class_0) / constant);
+            temp = (int) (Math.abs(template.class_0 - test.class_0) * Math.abs(template.class_0 - test.class_0) / constant);
         }
         if (temp != 0) {
             x = x + temp;
@@ -255,5 +267,165 @@ public class Frequency {
 
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public int getClass_0() {
+        return class_0;
+    }
+
+    public void setClass_0(int class_0) {
+        this.class_0 = class_0;
+    }
+
+    public int getClass_1() {
+        return class_1;
+    }
+
+    public void setClass_1(int class_1) {
+        this.class_1 = class_1;
+    }
+
+    public int getClass_2() {
+        return class_2;
+    }
+
+    public void setClass_2(int class_2) {
+        this.class_2 = class_2;
+    }
+
+    public int getClass_3() {
+        return class_3;
+    }
+
+    public void setClass_3(int class_3) {
+        this.class_3 = class_3;
+    }
+
+    public int getClass_4() {
+        return class_4;
+    }
+
+    public void setClass_4(int class_4) {
+        this.class_4 = class_4;
+    }
+
+    public int getClass_5() {
+        return class_5;
+    }
+
+    public void setClass_5(int class_5) {
+        this.class_5 = class_5;
+    }
+
+    public int getClass_6() {
+        return class_6;
+    }
+
+    public void setClass_6(int class_6) {
+        this.class_6 = class_6;
+    }
+
+    public int getClass_7() {
+        return class_7;
+    }
+
+    public void setClass_7(int class_7) {
+        this.class_7 = class_7;
+    }
+
+    public int getClass_8() {
+        return class_8;
+    }
+
+    public void setClass_8(int class_8) {
+        this.class_8 = class_8;
+    }
+
+    public int getClass_9() {
+        return class_9;
+    }
+
+    public void setClass_9(int class_9) {
+        this.class_9 = class_9;
+    }
+
+    public int getClass_10() {
+        return class_10;
+    }
+
+    public void setClass_10(int class_10) {
+        this.class_10 = class_10;
+    }
+
+    public int getClass_11() {
+        return class_11;
+    }
+
+    public void setClass_11(int class_11) {
+        this.class_11 = class_11;
+    }
+
+    public int getClass_12() {
+        return class_12;
+    }
+
+    public void setClass_12(int class_12) {
+        this.class_12 = class_12;
+    }
+
+    public int getClass_13() {
+        return class_13;
+    }
+
+    public void setClass_13(int class_13) {
+        this.class_13 = class_13;
+    }
+
+    public int getClass_14() {
+        return class_14;
+    }
+
+    public void setClass_14(int class_14) {
+        this.class_14 = class_14;
+    }
+
+    public int getClass_15() {
+        return class_15;
+    }
+
+    public void setClass_15(int class_15) {
+        this.class_15 = class_15;
+    }
+
+    public int getClass_16() {
+        return class_16;
+    }
+
+    public void setClass_16(int class_16) {
+        this.class_16 = class_16;
+    }
+
+    public int getClass_17() {
+        return class_17;
+    }
+
+    public void setClass_17(int class_17) {
+        this.class_17 = class_17;
+    }
+
+    public int getClass_18() {
+        return class_18;
+    }
+
+    public void setClass_18(int class_18) {
+        this.class_18 = class_18;
+    }
+
+    public int getClass_19() {
+        return class_19;
+    }
+
+    public void setClass_19(int class_19) {
+        this.class_19 = class_19;
     }
 }

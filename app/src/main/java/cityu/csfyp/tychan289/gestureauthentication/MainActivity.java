@@ -20,7 +20,7 @@ public class MainActivity extends AppCompatActivity {
         editText = (EditText) findViewById(R.id.main_username_input);
         textView = (TextView) findViewById(R.id.main_instruction);
     }
-
+    //TODO: Disable back button or find another way to open screen
     //Register (training)
     public void register(View view) {
         String username = editText.getText().toString();
@@ -30,7 +30,7 @@ public class MainActivity extends AppCompatActivity {
         intent.putExtra("username", username);
         startActivity(intent);
     }
-
+    //TODO: Disable back button or find another way to open screen
     //Login (testing)
     public void login(View view){
         String username = editText.getText().toString();

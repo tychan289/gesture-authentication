@@ -1,5 +1,6 @@
 package cityu.csfyp.tychan289.gestureauthentication;
 
+import android.arch.persistence.room.Room;
 import android.content.Context;
 import android.content.Intent;
 import android.hardware.Sensor;
@@ -17,7 +18,10 @@ import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import cityu.csfyp.tychan289.gestureauthentication.roomEntity.Frequency;
+import cityu.csfyp.tychan289.gestureauthentication.AppDatabase.AppDatabase;
+import cityu.csfyp.tychan289.gestureauthentication.roomEntity.FrequencyX;
+import cityu.csfyp.tychan289.gestureauthentication.roomEntity.FrequencyY;
+import cityu.csfyp.tychan289.gestureauthentication.roomEntity.FrequencyZ;
 
 public class RegisterActivity extends AppCompatActivity implements SensorEventListener {
 
@@ -40,9 +44,9 @@ public class RegisterActivity extends AppCompatActivity implements SensorEventLi
     private ArrayList data_y = new ArrayList();
     private ArrayList data_z = new ArrayList();
     private int trial = 1;
-    private Frequency frequencyX, frequencyY, frequencyZ;
-    private Frequency frequencyA, frequencyB, frequencyC;
-    private Frequency resultX, resultY, resultZ;
+    private FrequencyX frequencyX;
+    private FrequencyY frequencyY;
+    private FrequencyZ frequencyZ;
 
     //Constant
     private static final char x_type = 'x';
@@ -52,6 +56,9 @@ public class RegisterActivity extends AppCompatActivity implements SensorEventLi
     private static final String start = "START";
     private static final String stop = "STOP";
 
+    //Database
+    AppDatabase db;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -59,7 +66,7 @@ public class RegisterActivity extends AppCompatActivity implements SensorEventLi
 
         //Get views of activity_register
         welcome_text = (TextView) findViewById(R.id.welcome);
-        toggle_button = (Button) findViewById(R.id.toggle_register_btn);
+        toggle_button = (Button) findViewById(R.id.register_toggle);
         instruction4 = (TextView) findViewById(R.id.register_instruction4);
 
         //Change welcoming text from intent
@@ -70,6 +77,13 @@ public class RegisterActivity extends AppCompatActivity implements SensorEventLi
         //Get sensor
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+
+        //Get DB
+        db = providesAppDatabase();
+    }
+
+    private AppDatabase providesAppDatabase() {
+        return Room.databaseBuilder(getApplicationContext(), AppDatabase.class, "database").allowMainThreadQueries().build();
     }
 
     private void welcome(String username) {
@@ -86,6 +100,13 @@ public class RegisterActivity extends AppCompatActivity implements SensorEventLi
         if (timerRunning) {
             stopTimer();
             toggle_button.setText(start);
+            if (trial > trainingLimit){
+                //TODO: Disable back button or find another way to open screen
+                //Prompt login page
+                Intent intent = new Intent(this, LoginActivity.class);
+                intent.putExtra("username", username);
+                startActivity(intent);
+            }
         } else {
             startTimer();
             toggle_button.setText(stop);
@@ -116,19 +137,29 @@ public class RegisterActivity extends AppCompatActivity implements SensorEventLi
 
         //Turn data into frequency objects
         if (trial == 1) {
-            frequencyX = Classification.classify(data_x, x_type);
-            frequencyY = Classification.classify(data_y, y_type);
-            frequencyZ = Classification.classify(data_z, z_type);
+            frequencyX = (FrequencyX) Classification.classify(data_x, x_type, username);
+            frequencyY = (FrequencyY) Classification.classify(data_y, y_type, username);
+            frequencyZ = (FrequencyZ) Classification.classify(data_z, z_type, username);
         } else {
-            frequencyX = Classification.classify(data_x, x_type, frequencyX);
-            frequencyY = Classification.classify(data_y, y_type, frequencyY);
-            frequencyZ = Classification.classify(data_z, z_type, frequencyZ);
+            frequencyX = (FrequencyX) Classification.classify(data_x, x_type, username, frequencyX);
+            frequencyY = (FrequencyY) Classification.classify(data_y, y_type, username, frequencyY);
+            frequencyZ = (FrequencyZ) Classification.classify(data_z, z_type, username, frequencyZ);
             if (trial == trainingLimit) {
-                //Store entity
-
+                //Delete old if exists
+                if (db.frequencyXDao().getFrequencyX(username) != null){
+                    FrequencyX oldX = db.frequencyXDao().getFrequencyX(username);
+                    db.frequencyXDao().delete(oldX);
+                    FrequencyY oldY = db.frequencyYDao().getFrequencyY(username);
+                    db.frequencyYDao().delete(oldY);
+                    FrequencyZ oldZ = db.frequencyZDao().getFrequencyZ(username);
+                    db.frequencyZDao().delete(oldZ);
+                }
+                db.frequencyXDao().insert(frequencyX);
+                db.frequencyYDao().insert(frequencyY);
+                db.frequencyZDao().insert(frequencyZ);
             }
         }
-        Log.d("DEBUG", "Breakpoint");
+
         Log.i("TRIAL", "Finished trial " + trial);
 
         //Clear stored data
