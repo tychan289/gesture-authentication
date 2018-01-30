@@ -10,7 +10,7 @@ import android.arch.persistence.room.Update;
 import cityu.csfyp.tychan289.gestureauthentication.roomEntity.FrequencyX;
 
 /**
- * Created by Moonviler on 17/1/18.
+ * Created by Moonviler
  */
 
 @Dao

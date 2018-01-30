@@ -19,12 +19,13 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import cityu.csfyp.tychan289.gestureauthentication.AppDatabase.AppDatabase;
+import cityu.csfyp.tychan289.gestureauthentication.roomEntity.Frequency;
 import cityu.csfyp.tychan289.gestureauthentication.roomEntity.FrequencyX;
 import cityu.csfyp.tychan289.gestureauthentication.roomEntity.FrequencyY;
 import cityu.csfyp.tychan289.gestureauthentication.roomEntity.FrequencyZ;
 
 /**
- * Created by Moonviler on 19/1/18.
+ * Created by Moonviler
  */
 
 public class LoginActivity extends AppCompatActivity implements SensorEventListener {
@@ -43,12 +44,14 @@ public class LoginActivity extends AppCompatActivity implements SensorEventListe
     private double gravity[] = new double[3];
     private double linear_acceleration[] = new double[3];
     private boolean timerRunning = false;
+    private boolean result;
     private ArrayList data_x = new ArrayList();
     private ArrayList data_y = new ArrayList();
     private ArrayList data_z = new ArrayList();
     private FrequencyX frequencyX, frequencyA;
     private FrequencyY frequencyY, frequencyB;
     private FrequencyZ frequencyZ, frequencyC;
+    private double distanceX, distanceY, distanceZ;
 
     //Constant
     private static final char x_type = 'x';
@@ -64,6 +67,7 @@ public class LoginActivity extends AppCompatActivity implements SensorEventListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+        setTitle("Login");
 
         //Get views of activity_register
         welcome_text = (TextView) findViewById(R.id.welcome);
@@ -71,7 +75,7 @@ public class LoginActivity extends AppCompatActivity implements SensorEventListe
 
         //Change welcoming text from intent
         Intent intent = getIntent();
-        username = intent.getStringExtra("username");
+        username = intent.getStringExtra("username_input");
         welcome(username);
 
         //Get sensor
@@ -83,7 +87,7 @@ public class LoginActivity extends AppCompatActivity implements SensorEventListe
     }
 
     private AppDatabase providesAppDatabase() {
-        return Room.databaseBuilder(getApplicationContext(), AppDatabase.class, "database").build();
+        return Room.databaseBuilder(getApplicationContext(), AppDatabase.class, "database").allowMainThreadQueries().build();
     }
 
     private void welcome(String username) {
@@ -95,6 +99,16 @@ public class LoginActivity extends AppCompatActivity implements SensorEventListe
         if (timerRunning) {
             stopTimer();
             toggle_button.setText(start);
+
+            //Prompt result page
+            Intent intent = new Intent(this, ResultActivity.class);
+            if (result) {
+                intent.putExtra("result", "Login success!");
+            } else {
+                intent.putExtra("result", "Login fail!");
+            }
+            intent.putExtra("distance", "x: " + distanceX + "\n y: " + distanceY + "\n z: " + distanceZ);
+            startActivity(intent);
         } else {
             startTimer();
             toggle_button.setText(stop);
@@ -109,7 +123,7 @@ public class LoginActivity extends AppCompatActivity implements SensorEventListe
         timer = new Timer();
         timer.schedule(new TimerTask() {
             public void run() {
-                Log.i("ACCELEROMETER VALUES", linear_acceleration[0] + "," + linear_acceleration[1] + "," + linear_acceleration[2]);
+                //Log.i("ACCELEROMETER VALUES", linear_acceleration[0] + "," + linear_acceleration[1] + "," + linear_acceleration[2]);
                 data_x.add(linear_acceleration[0]);
                 data_y.add(linear_acceleration[1]);
                 data_z.add(linear_acceleration[2]);
@@ -133,15 +147,14 @@ public class LoginActivity extends AppCompatActivity implements SensorEventListe
         frequencyY = db.frequencyYDao().getFrequencyY(username);
         frequencyZ = db.frequencyZDao().getFrequencyZ(username);
 
-        //TODO: Implements comparing method
-        //Compare data with stored one
-//        resultX = Frequency.compare(frequencyA, frequencyX);
-//        resultY = Frequency.compare(frequencyB, frequencyY);
-//        resultZ = Frequency.compare(frequencyC, frequencyZ);
-//            Log.i("RESULT","Chi-square test result x = " + Frequency.chi_square_test(frequencyA,frequencyX));
-//            Log.i("RESULT","Chi-square test result y = " + Frequency.chi_square_test(frequencyB,frequencyY));
-//            Log.i("RESULT","Chi-square test result z = " + Frequency.chi_square_test(frequencyC,frequencyZ));
-        Log.d("DEBUG", "Breakpoint");
+        //Find Euclidean Distance
+        distanceX = Frequency.euclideanDistance(frequencyX, frequencyA);
+        distanceY = Frequency.euclideanDistance(frequencyY, frequencyB);
+        distanceZ = Frequency.euclideanDistance(frequencyZ, frequencyC);
+        Log.d("EDist", "x: " + distanceX + ", y: " + distanceY + ", z: " + distanceZ);
+        result = validateLogin(distanceX, distanceY, distanceZ);
+
+        //Log.d("DEBUG", "Breakpoint");
 
         //Clear stored data
         data_x.clear();
@@ -149,6 +162,14 @@ public class LoginActivity extends AppCompatActivity implements SensorEventListe
         data_z.clear();
 
         timerRunning = false;
+    }
+
+    //
+    private boolean validateLogin(double distX, double distY, double distZ) {
+        if (distX > 30 || distY > 30 || distZ > 30) {
+            return false;
+        }
+        return true;
     }
 
     //Sensor is non-stop loading acceleration data

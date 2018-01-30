@@ -11,7 +11,7 @@ import cityu.csfyp.tychan289.gestureauthentication.roomEntity.FrequencyX;
 import cityu.csfyp.tychan289.gestureauthentication.roomEntity.FrequencyZ;
 
 /**
- * Created by Moonviler on 17/1/18.
+ * Created by Moonviler
  */
 
 @Dao

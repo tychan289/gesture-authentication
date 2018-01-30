@@ -52,7 +52,7 @@ public class RegisterActivity extends AppCompatActivity implements SensorEventLi
     private static final char x_type = 'x';
     private static final char y_type = 'y';
     private static final char z_type = 'z';
-    private static final int trainingLimit = 2;
+    private static final int trainingLimit = 3;
     private static final String start = "START";
     private static final String stop = "STOP";
 
@@ -63,6 +63,7 @@ public class RegisterActivity extends AppCompatActivity implements SensorEventLi
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
+        setTitle("Registration");
 
         //Get views of activity_register
         welcome_text = (TextView) findViewById(R.id.welcome);
@@ -71,7 +72,7 @@ public class RegisterActivity extends AppCompatActivity implements SensorEventLi
 
         //Change welcoming text from intent
         Intent intent = getIntent();
-        username = intent.getStringExtra("username");
+        username = intent.getStringExtra("username_input");
         welcome(username);
 
         //Get sensor
@@ -92,19 +93,13 @@ public class RegisterActivity extends AppCompatActivity implements SensorEventLi
 
     //Toggle timer
     public void toggleTimer(View v) {
-        //Finish training ...
-        if (trial >= trainingLimit) {
-            //Prompt login screen
-        }
-
         if (timerRunning) {
             stopTimer();
             toggle_button.setText(start);
             if (trial > trainingLimit){
-                //TODO: Disable back button or find another way to open screen
-                //Prompt login page
+                //Prompt login page when finish training
                 Intent intent = new Intent(this, LoginActivity.class);
-                intent.putExtra("username", username);
+                intent.putExtra("username_input", username);
                 startActivity(intent);
             }
         } else {
@@ -191,6 +186,12 @@ public class RegisterActivity extends AppCompatActivity implements SensorEventLi
         linear_acceleration[0] = event.values[0] - gravity[0];
         linear_acceleration[1] = event.values[1] - gravity[1];
         linear_acceleration[2] = event.values[2] - gravity[2];
+    }
+
+
+    @Override
+    public void onBackPressed(){
+
     }
 
     /* Unused method */

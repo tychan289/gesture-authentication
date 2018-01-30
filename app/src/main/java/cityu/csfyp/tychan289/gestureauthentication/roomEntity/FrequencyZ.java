@@ -5,7 +5,7 @@ import android.arch.persistence.room.Index;
 import android.arch.persistence.room.PrimaryKey;
 
 /**
- * Created by Moonviler on 17/1/18.
+ * Created by Moonviler
  */
 
 @Entity(indices = {@Index(value = {"username"}, unique = true)})

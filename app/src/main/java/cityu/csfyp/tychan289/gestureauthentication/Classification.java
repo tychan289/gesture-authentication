@@ -8,7 +8,7 @@ import cityu.csfyp.tychan289.gestureauthentication.roomEntity.FrequencyY;
 import cityu.csfyp.tychan289.gestureauthentication.roomEntity.FrequencyZ;
 
 /**
- * Created by Moonviler on 18/1/18.
+ * Created by Moonviler
  */
 
 public class Classification {
