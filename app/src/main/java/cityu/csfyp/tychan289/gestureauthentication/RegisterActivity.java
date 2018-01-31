@@ -68,7 +68,7 @@ public class RegisterActivity extends AppCompatActivity implements SensorEventLi
         //Get views of activity_register
         welcome_text = (TextView) findViewById(R.id.welcome);
         toggle_button = (Button) findViewById(R.id.register_toggle);
-        instruction4 = (TextView) findViewById(R.id.register_instruction4);
+        instruction4 = (TextView) findViewById(R.id.register_instruction5);
 
         //Change welcoming text from intent
         Intent intent = getIntent();
