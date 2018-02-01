@@ -188,12 +188,6 @@ public class RegisterActivity extends AppCompatActivity implements SensorEventLi
         linear_acceleration[2] = event.values[2] - gravity[2];
     }
 
-
-    @Override
-    public void onBackPressed(){
-
-    }
-
     /* Unused method */
     @Override
     public final void onAccuracyChanged(Sensor sensor, int accuracy) {

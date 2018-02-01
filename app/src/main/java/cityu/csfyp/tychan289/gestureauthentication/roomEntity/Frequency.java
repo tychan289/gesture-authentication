@@ -28,8 +28,6 @@ public class Frequency {
         class_19 = 0;
     }
 
-    private static final double constant = 1;
-
     private String username;
     private int class_0;
     private int class_1;
@@ -141,30 +139,30 @@ public class Frequency {
         return f1;
     }
 
-    public static Frequency compare(Frequency f1, Frequency f2) {
-        Frequency f = new Frequency();
-        f.class_0 = Math.abs(f1.class_0 - f2.class_0);
-        f.class_1 = Math.abs(f1.class_1 - f2.class_1);
-        f.class_2 = Math.abs(f1.class_2 - f2.class_2);
-        f.class_3 = Math.abs(f1.class_3 - f2.class_3);
-        f.class_4 = Math.abs(f1.class_4 - f2.class_4);
-        f.class_5 = Math.abs(f1.class_5 - f2.class_5);
-        f.class_6 = Math.abs(f1.class_6 - f2.class_6);
-        f.class_7 = Math.abs(f1.class_7 - f2.class_7);
-        f.class_8 = Math.abs(f1.class_8 - f2.class_8);
-        f.class_9 = Math.abs(f1.class_9 - f2.class_9);
-        f.class_10 = Math.abs(f1.class_10 - f2.class_10);
-        f.class_11 = Math.abs(f1.class_11 - f2.class_11);
-        f.class_12 = Math.abs(f1.class_12 - f2.class_12);
-        f.class_13 = Math.abs(f1.class_13 - f2.class_13);
-        f.class_14 = Math.abs(f1.class_14 - f2.class_14);
-        f.class_15 = Math.abs(f1.class_15 - f2.class_15);
-        f.class_16 = Math.abs(f1.class_16 - f2.class_16);
-        f.class_17 = Math.abs(f1.class_17 - f2.class_17);
-        f.class_18 = Math.abs(f1.class_18 - f2.class_18);
-        f.class_19 = Math.abs(f1.class_19 - f2.class_19);
-        return f;
-    }
+//    public static Frequency compare(Frequency f1, Frequency f2) {
+//        Frequency f = new Frequency();
+//        f.class_0 = Math.abs(f1.class_0 - f2.class_0);
+//        f.class_1 = Math.abs(f1.class_1 - f2.class_1);
+//        f.class_2 = Math.abs(f1.class_2 - f2.class_2);
+//        f.class_3 = Math.abs(f1.class_3 - f2.class_3);
+//        f.class_4 = Math.abs(f1.class_4 - f2.class_4);
+//        f.class_5 = Math.abs(f1.class_5 - f2.class_5);
+//        f.class_6 = Math.abs(f1.class_6 - f2.class_6);
+//        f.class_7 = Math.abs(f1.class_7 - f2.class_7);
+//        f.class_8 = Math.abs(f1.class_8 - f2.class_8);
+//        f.class_9 = Math.abs(f1.class_9 - f2.class_9);
+//        f.class_10 = Math.abs(f1.class_10 - f2.class_10);
+//        f.class_11 = Math.abs(f1.class_11 - f2.class_11);
+//        f.class_12 = Math.abs(f1.class_12 - f2.class_12);
+//        f.class_13 = Math.abs(f1.class_13 - f2.class_13);
+//        f.class_14 = Math.abs(f1.class_14 - f2.class_14);
+//        f.class_15 = Math.abs(f1.class_15 - f2.class_15);
+//        f.class_16 = Math.abs(f1.class_16 - f2.class_16);
+//        f.class_17 = Math.abs(f1.class_17 - f2.class_17);
+//        f.class_18 = Math.abs(f1.class_18 - f2.class_18);
+//        f.class_19 = Math.abs(f1.class_19 - f2.class_19);
+//        return f;
+//    }
 
     //Euclidean Distance
     public static double euclideanDistance(Frequency f1, Frequency f2) {
