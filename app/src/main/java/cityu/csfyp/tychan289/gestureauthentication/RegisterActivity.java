@@ -108,6 +108,11 @@ public class RegisterActivity extends AppCompatActivity implements SensorEventLi
         }
     }
 
+    //TODO: draw on basic four points, check starting point
+    //TODO: Timing between each stroke
+    //TODO: DTW for whole gesture
+    //TODO: FAR FRR
+
     //Timer to record the sensor data per 10ms
     private void startTimer() {
         timerRunning = true;
