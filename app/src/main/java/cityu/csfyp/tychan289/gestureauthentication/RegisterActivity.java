@@ -19,9 +19,9 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import cityu.csfyp.tychan289.gestureauthentication.AppDatabase.AppDatabase;
-import cityu.csfyp.tychan289.gestureauthentication.roomEntity.FrequencyX;
-import cityu.csfyp.tychan289.gestureauthentication.roomEntity.FrequencyY;
-import cityu.csfyp.tychan289.gestureauthentication.roomEntity.FrequencyZ;
+import cityu.csfyp.tychan289.gestureauthentication.roomEntity.AccelDataX;
+import cityu.csfyp.tychan289.gestureauthentication.roomEntity.AccelDataY;
+import cityu.csfyp.tychan289.gestureauthentication.roomEntity.AccelDataZ;
 
 public class RegisterActivity extends AppCompatActivity implements SensorEventListener {
 
@@ -39,14 +39,17 @@ public class RegisterActivity extends AppCompatActivity implements SensorEventLi
     String username;
     private double gravity[] = new double[3];
     private double linear_acceleration[] = new double[3];
+    private double data_values[] = new double[3];
     private boolean timerRunning = false;
     private ArrayList data_x = new ArrayList();
     private ArrayList data_y = new ArrayList();
     private ArrayList data_z = new ArrayList();
     private int trial = 1;
-    private FrequencyX frequencyX;
-    private FrequencyY frequencyY;
-    private FrequencyZ frequencyZ;
+    private AccelDataX accelDataX;
+    private AccelDataY accelDataY;
+    private AccelDataZ accelDataZ;
+    private double history, current, change;
+    private boolean start_b = false;
 
     //Constant
     private static final char x_type = 'x';
@@ -55,6 +58,7 @@ public class RegisterActivity extends AppCompatActivity implements SensorEventLi
     private static final int trainingLimit = 3;
     private static final String start = "START";
     private static final String stop = "STOP";
+    private static final String data_s = "DATA";
 
     //Database
     AppDatabase db;
@@ -108,23 +112,36 @@ public class RegisterActivity extends AppCompatActivity implements SensorEventLi
         }
     }
 
-    //TODO: draw on basic four points, check starting point
-    //TODO: Timing between each stroke
-    //TODO: DTW for whole gesture
-    //TODO: FAR FRR
+    /*TODO: Program Flow
+    * Determine starting point
+    * Record acceleration data
+    * Store data / extract data
+    * Dynamic Time Warping(data)
+    * Identify movement directions & time spent
+    * */
+    //TODO: Evaluation
 
     //Timer to record the sensor data per 10ms
     private void startTimer() {
         timerRunning = true;
 
-        Log.i("TIMER", "Start recording accelerometer values");
+        Log.i("TIMER", "Start timer...");
         timer = new Timer();
         timer.schedule(new TimerTask() {
             public void run() {
-                Log.i("ACCELEROMETER VALUES", linear_acceleration[0] + "," + linear_acceleration[1] + "," + linear_acceleration[2]);
-                data_x.add(linear_acceleration[0]);
-                data_y.add(linear_acceleration[1]);
-                data_z.add(linear_acceleration[2]);
+                if (start_b){
+                    data_x.add(data_values[0]);
+                    data_y.add(data_values[1]);
+                    data_z.add(data_values[2]);
+                } else {
+                    if (change > 0.15) {
+                        start_b = true;
+                        Log.i(data_s, "Start recording data...");
+                        data_x.add(data_values[0]);
+                        data_y.add(data_values[1]);
+                        data_z.add(data_values[2]);
+                    }
+                }
             }
         }, 0, 10);
     }
@@ -133,32 +150,40 @@ public class RegisterActivity extends AppCompatActivity implements SensorEventLi
     private void stopTimer() {
         timer.cancel();
         timer.purge();
-        Log.i("TIMER", "Stop recording accelerometer values");
+        Log.i("TIMER", "Stop timer...");
+
+        accelDataX = new AccelDataX(username, TypeConvertors.ArrayListDoubletoString(data_x));
+        accelDataY = new AccelDataY(username, TypeConvertors.ArrayListDoubletoString(data_y));
+        accelDataZ = new AccelDataZ(username, TypeConvertors.ArrayListDoubletoString(data_z));
+
+        db.accelDataXDao().insert(accelDataX);
+        db.accelDataYDao().insert(accelDataY);
+        db.accelDataZDao().insert(accelDataZ);
 
         //Turn data into frequency objects
-        if (trial == 1) {
-            frequencyX = (FrequencyX) Classification.classify(data_x, x_type, username);
-            frequencyY = (FrequencyY) Classification.classify(data_y, y_type, username);
-            frequencyZ = (FrequencyZ) Classification.classify(data_z, z_type, username);
-        } else {
-            frequencyX = (FrequencyX) Classification.classify(data_x, x_type, username, frequencyX);
-            frequencyY = (FrequencyY) Classification.classify(data_y, y_type, username, frequencyY);
-            frequencyZ = (FrequencyZ) Classification.classify(data_z, z_type, username, frequencyZ);
-            if (trial == trainingLimit) {
-                //Delete old if exists
-                if (db.frequencyXDao().getFrequencyX(username) != null){
-                    FrequencyX oldX = db.frequencyXDao().getFrequencyX(username);
-                    db.frequencyXDao().delete(oldX);
-                    FrequencyY oldY = db.frequencyYDao().getFrequencyY(username);
-                    db.frequencyYDao().delete(oldY);
-                    FrequencyZ oldZ = db.frequencyZDao().getFrequencyZ(username);
-                    db.frequencyZDao().delete(oldZ);
-                }
-                db.frequencyXDao().insert(frequencyX);
-                db.frequencyYDao().insert(frequencyY);
-                db.frequencyZDao().insert(frequencyZ);
-            }
-        }
+//        if (trial == 1) {
+//            frequencyX = (FrequencyX) Classification.classify(data_x, x_type, username);
+//            frequencyY = (FrequencyY) Classification.classify(data_y, y_type, username);
+//            frequencyZ = (FrequencyZ) Classification.classify(data_z, z_type, username);
+//        } else {
+//            frequencyX = (FrequencyX) Classification.classify(data_x, x_type, username, frequencyX);
+//            frequencyY = (FrequencyY) Classification.classify(data_y, y_type, username, frequencyY);
+//            frequencyZ = (FrequencyZ) Classification.classify(data_z, z_type, username, frequencyZ);
+//            if (trial == trainingLimit) {
+//                //Delete old if exists
+//                if (db.frequencyXDao().getFrequencyX(username) != null){
+//                    FrequencyX oldX = db.frequencyXDao().getFrequencyX(username);
+//                    db.frequencyXDao().delete(oldX);
+//                    FrequencyY oldY = db.frequencyYDao().getFrequencyY(username);
+//                    db.frequencyYDao().delete(oldY);
+//                    FrequencyZ oldZ = db.frequencyZDao().getFrequencyZ(username);
+//                    db.frequencyZDao().delete(oldZ);
+//                }
+//                db.frequencyXDao().insert(frequencyX);
+//                db.frequencyYDao().insert(frequencyY);
+//                db.frequencyZDao().insert(frequencyZ);
+//            }
+//        }
 
         Log.i("TRIAL", "Finished trial " + trial);
 
@@ -182,6 +207,11 @@ public class RegisterActivity extends AppCompatActivity implements SensorEventLi
         // with t, the low-pass filter's time-constant t = 0.05
         // and dT, the event delivery rate = 0.01s (10ms)
 
+        history = current;
+        current = Math.sqrt(event.values[0] * event.values[0] + event.values[1] * event.values[1] + event.values[2] * event.values[2]);
+        change = Math.abs(history - current);
+//        Log.i("Vector Change", Double.ArrayListDoubletoString(change));
+
         final double alpha = 0.05 / 0.06; //0.833...
 
         gravity[0] = alpha * gravity[0] + (1 - alpha) * event.values[0]; //0 + (1 - alpha) * acceleration
@@ -191,6 +221,10 @@ public class RegisterActivity extends AppCompatActivity implements SensorEventLi
         linear_acceleration[0] = event.values[0] - gravity[0];
         linear_acceleration[1] = event.values[1] - gravity[1];
         linear_acceleration[2] = event.values[2] - gravity[2];
+
+        data_values[0] = event.values[0];
+        data_values[1] = event.values[1];
+        data_values[2] = event.values[2];
     }
 
     /* Unused method */

@@ -19,7 +19,6 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import cityu.csfyp.tychan289.gestureauthentication.AppDatabase.AppDatabase;
-import cityu.csfyp.tychan289.gestureauthentication.roomEntity.Frequency;
 import cityu.csfyp.tychan289.gestureauthentication.roomEntity.FrequencyX;
 import cityu.csfyp.tychan289.gestureauthentication.roomEntity.FrequencyY;
 import cityu.csfyp.tychan289.gestureauthentication.roomEntity.FrequencyZ;
@@ -43,6 +42,7 @@ public class LoginActivity extends AppCompatActivity implements SensorEventListe
     String username;
     private double gravity[] = new double[3];
     private double linear_acceleration[] = new double[3];
+    private double data_values[] = new double[3];
     private boolean timerRunning = false;
     private boolean result;
     private ArrayList data_x = new ArrayList();
@@ -52,13 +52,20 @@ public class LoginActivity extends AppCompatActivity implements SensorEventListe
     private FrequencyY frequencyY, frequencyB;
     private FrequencyZ frequencyZ, frequencyC;
     private double distanceX, distanceY, distanceZ;
+    private double history, current, change;
+    private boolean start_b = false;
 
     //Constant
     private static final char x_type = 'x';
     private static final char y_type = 'y';
     private static final char z_type = 'z';
-    private static final String start = "START";
-    private static final String stop = "STOP";
+    private static final String start_s = "START";
+    private static final String stop_s = "STOP";
+    private final double alpha = 0.05 / 0.06; //0.833...
+    private static final String right_s = "RIGHT";
+    private static final String left_s = "LEFT";
+    private static final String data_s = "DATA";
+    private static final String timer_s = "TIMER";
 
     //Database
     AppDatabase db;
@@ -98,7 +105,7 @@ public class LoginActivity extends AppCompatActivity implements SensorEventListe
     public void toggleTimer(View v) {
         if (timerRunning) {
             stopTimer();
-            toggle_button.setText(start);
+            toggle_button.setText(start_s);
 
             //Prompt result page
             Intent intent = new Intent(this, ResultActivity.class);
@@ -107,11 +114,11 @@ public class LoginActivity extends AppCompatActivity implements SensorEventListe
             } else {
                 intent.putExtra("result", "Login fail!");
             }
-            intent.putExtra("distance", "x: " + distanceX + "\n y: " + distanceY + "\n z: " + distanceZ);
+            intent.putExtra("distance", "x/" + distanceX + "\n y/" + distanceY + "\n z/" + distanceZ);
             startActivity(intent);
         } else {
             startTimer();
-            toggle_button.setText(stop);
+            toggle_button.setText(stop_s);
         }
     }
 
@@ -119,14 +126,23 @@ public class LoginActivity extends AppCompatActivity implements SensorEventListe
     private void startTimer() {
         timerRunning = true;
 
-        Log.i("TIMER", "Start recording accelerometer values");
+        Log.i(timer_s, "Start timer...");
         timer = new Timer();
         timer.schedule(new TimerTask() {
             public void run() {
-                //Log.i("ACCELEROMETER VALUES", linear_acceleration[0] + "," + linear_acceleration[1] + "," + linear_acceleration[2]);
-                data_x.add(linear_acceleration[0]);
-                data_y.add(linear_acceleration[1]);
-                data_z.add(linear_acceleration[2]);
+                if (start_b) {
+                    data_x.add(data_values[0]);
+                    data_y.add(data_values[1]);
+                    data_z.add(data_values[2]);
+                } else {
+                    if (change > 0.15) {
+                        start_b = true;
+                        data_x.add(data_values[0]);
+                        data_y.add(data_values[1]);
+                        data_z.add(data_values[2]);
+                        Log.i(data_s, "Start recording data...");
+                    }
+                }
             }
         }, 0, 10);
     }
@@ -135,24 +151,32 @@ public class LoginActivity extends AppCompatActivity implements SensorEventListe
     private void stopTimer() {
         timer.cancel();
         timer.purge();
-        Log.i("TIMER", "Stop recording accelerometer values");
+        Log.i(timer_s, "Stop timer...");
 
-        //Turn testing data into frequency objects
-        frequencyA = (FrequencyX) Classification.classify(data_x, x_type, username);
-        frequencyB = (FrequencyY) Classification.classify(data_y, y_type, username);
-        frequencyC = (FrequencyZ) Classification.classify(data_z, z_type, username);
+        //Use Dynamic Time Warping to find distance
+        //DynamicTimeWarping.run()
+        double scorex = DynamicTimeWarping.run(TypeConvertors.toArrayListDouble(db.accelDataXDao().getAccelData(username).getData()), data_x);
+        double scorey = DynamicTimeWarping.run(TypeConvertors.toArrayListDouble(db.accelDataYDao().getAccelData(username).getData()), data_y);
+        double scorez = DynamicTimeWarping.run(TypeConvertors.toArrayListDouble(db.accelDataZDao().getAccelData(username).getData()), data_z);
 
-        //Get stored object
-        frequencyX = db.frequencyXDao().getFrequencyX(username);
-        frequencyY = db.frequencyYDao().getFrequencyY(username);
-        frequencyZ = db.frequencyZDao().getFrequencyZ(username);
+        Log.d("DEBUG", "DTW Score x y z :" + scorex + ", " + scorey + ", " + scorez);
 
-        //Find Euclidean Distance
-        distanceX = Frequency.euclideanDistance(frequencyX, frequencyA);
-        distanceY = Frequency.euclideanDistance(frequencyY, frequencyB);
-        distanceZ = Frequency.euclideanDistance(frequencyZ, frequencyC);
-        Log.d("EDist", "x: " + distanceX + ", y: " + distanceY + ", z: " + distanceZ);
-        result = validateLogin(distanceX, distanceY, distanceZ);
+//        //Turn testing data into frequency objects
+//        frequencyA = (FrequencyX) Classification.classify(data_x, x_type, username);
+//        frequencyB = (FrequencyY) Classification.classify(data_y, y_type, username);
+//        frequencyC = (FrequencyZ) Classification.classify(data_z, z_type, username);
+//
+//        //Get stored object
+//        frequencyX = db.frequencyXDao().getFrequencyX(username);
+//        frequencyY = db.frequencyYDao().getFrequencyY(username);
+//        frequencyZ = db.frequencyZDao().getFrequencyZ(username);
+//
+//        //Find Euclidean Distance
+//        distanceX = Frequency.euclideanDistance(frequencyX, frequencyA);
+//        distanceY = Frequency.euclideanDistance(frequencyY, frequencyB);
+//        distanceZ = Frequency.euclideanDistance(frequencyZ, frequencyC);
+//        Log.d("EDist", "x: " + distanceX + ", y: " + distanceY + ", z: " + distanceZ);
+//        result = validateLogin(distanceX, distanceY, distanceZ);
 
         //Log.d("DEBUG", "Breakpoint");
 
@@ -172,7 +196,7 @@ public class LoginActivity extends AppCompatActivity implements SensorEventListe
         return true;
     }
 
-    //Sensor is non-stop loading acceleration data
+    //Sensor is non-stop_s loading acceleration data
     //Apply low-pass filter to filter the gravity
     @Override
     public final void onSensorChanged(SensorEvent event) {
@@ -180,7 +204,10 @@ public class LoginActivity extends AppCompatActivity implements SensorEventListe
         // with t, the low-pass filter's time-constant t = 0.05
         // and dT, the event delivery rate = 0.01s (10ms)
 
-        final double alpha = 0.05 / 0.06; //0.833...
+        history = current;
+        current = Math.sqrt(event.values[0] * event.values[0] + event.values[1] * event.values[1] + event.values[2] * event.values[2]);
+        change = Math.abs(history - current);
+        Log.i("Vector Change", Double.toString(change));
 
         gravity[0] = alpha * gravity[0] + (1 - alpha) * event.values[0]; //0 + (1 - alpha) * acceleration
         gravity[1] = alpha * gravity[1] + (1 - alpha) * event.values[1];
@@ -189,6 +216,12 @@ public class LoginActivity extends AppCompatActivity implements SensorEventListe
         linear_acceleration[0] = event.values[0] - gravity[0];
         linear_acceleration[1] = event.values[1] - gravity[1];
         linear_acceleration[2] = event.values[2] - gravity[2];
+
+        data_values[0] = event.values[0];
+        data_values[1] = event.values[1];
+        data_values[2] = event.values[2];
+
+        Log.i(data_s, "x/" + event.values[0] + ", y/" + event.values[1] + ", z/" + event.values[2]);
     }
 
     /* Unused method */
