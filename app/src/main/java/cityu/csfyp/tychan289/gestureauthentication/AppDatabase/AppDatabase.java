@@ -2,30 +2,25 @@ package cityu.csfyp.tychan289.gestureauthentication.AppDatabase;
 
 import android.arch.persistence.room.Database;
 import android.arch.persistence.room.RoomDatabase;
+import android.arch.persistence.room.TypeConverters;
 
-import cityu.csfyp.tychan289.gestureauthentication.dao.AccelDataXDao;
-import cityu.csfyp.tychan289.gestureauthentication.dao.AccelDataYDao;
-import cityu.csfyp.tychan289.gestureauthentication.dao.AccelDataZDao;
-import cityu.csfyp.tychan289.gestureauthentication.dao.FrequencyXDao;
-import cityu.csfyp.tychan289.gestureauthentication.dao.FrequencyYDao;
-import cityu.csfyp.tychan289.gestureauthentication.dao.FrequencyZDao;
-import cityu.csfyp.tychan289.gestureauthentication.roomEntity.AccelDataX;
-import cityu.csfyp.tychan289.gestureauthentication.roomEntity.AccelDataY;
-import cityu.csfyp.tychan289.gestureauthentication.roomEntity.AccelDataZ;
-import cityu.csfyp.tychan289.gestureauthentication.roomEntity.FrequencyX;
-import cityu.csfyp.tychan289.gestureauthentication.roomEntity.FrequencyY;
-import cityu.csfyp.tychan289.gestureauthentication.roomEntity.FrequencyZ;
+import cityu.csfyp.tychan289.gestureauthentication.dao.AccelDataT1Dao;
+import cityu.csfyp.tychan289.gestureauthentication.dao.AccelDataT2Dao;
+import cityu.csfyp.tychan289.gestureauthentication.dao.AccelDataT3Dao;
+import cityu.csfyp.tychan289.gestureauthentication.roomEntity.AccelDataT1;
+import cityu.csfyp.tychan289.gestureauthentication.roomEntity.AccelDataT2;
+import cityu.csfyp.tychan289.gestureauthentication.roomEntity.AccelDataT3;
+import cityu.csfyp.tychan289.gestureauthentication.AppDatabase.DataConvertor;
 
 /**
  * Created by Moonviler
  */
+@TypeConverters(DataConvertor.class)
+@Database(version = 1, entities = {AccelDataT1.class, AccelDataT2.class, AccelDataT3.class}, exportSchema = false)
+public abstract class AppDatabase extends RoomDatabase {
+    public abstract AccelDataT1Dao accelDataT1Dao();
 
-@Database(version = 1, entities = {FrequencyX.class, FrequencyY.class, FrequencyZ.class, AccelDataX.class, AccelDataY.class, AccelDataZ.class})
-public abstract class AppDatabase extends RoomDatabase{
-//    public abstract FrequencyXDao frequencyXDao();
-//    public abstract FrequencyYDao frequencyYDao();
-//    public abstract FrequencyZDao frequencyZDao();
-    public abstract AccelDataXDao accelDataXDao();
-    public abstract AccelDataYDao accelDataYDao();
-    public abstract AccelDataZDao accelDataZDao();
+    public abstract AccelDataT2Dao accelDataT2Dao();
+
+    public abstract AccelDataT3Dao accelDataT3Dao();
 }

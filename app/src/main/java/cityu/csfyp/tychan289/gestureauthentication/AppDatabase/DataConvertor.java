@@ -1,10 +1,14 @@
-package cityu.csfyp.tychan289.gestureauthentication;
+package cityu.csfyp.tychan289.gestureauthentication.AppDatabase;
+
+import android.arch.persistence.room.TypeConverter;
+import android.arch.persistence.room.TypeConverters;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class TypeConvertors {
-    public static String ArrayListDoubletoString(ArrayList<Double> arrayList) {
+public class DataConvertor {
+    @TypeConverter
+    public String fromArrayListDouble(ArrayList<Double> arrayList) {
         StringBuilder builder = new StringBuilder();
         // Append all Integers in StringBuilder to the StringBuilder.
         for (double value : arrayList) {
@@ -16,7 +20,8 @@ public class TypeConvertors {
         return builder.toString();
     }
 
-    public static ArrayList toArrayListDouble(String s) {
+    @TypeConverter
+    public ArrayList<Double> toArrayListDouble(String s) {
         ArrayList<Double> dList = new ArrayList<>();
         ArrayList<String> list = new ArrayList<>(Arrays.asList(s.split(":")));
         for (String i : list) {

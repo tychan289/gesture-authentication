@@ -7,23 +7,19 @@ import android.arch.persistence.room.OnConflictStrategy;
 import android.arch.persistence.room.Query;
 import android.arch.persistence.room.Update;
 
-import cityu.csfyp.tychan289.gestureauthentication.roomEntity.FrequencyY;
-
-/**
- * Created by Moonviler
- */
+import cityu.csfyp.tychan289.gestureauthentication.roomEntity.AccelDataT2;
 
 @Dao
-public interface FrequencyYDao {
+public interface AccelDataT2Dao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    public void insert(FrequencyY object);
+    public void insert(AccelDataT2 object);
 
     @Update
-    public void update(FrequencyY object);
+    public void update(AccelDataT2 object);
 
     @Delete
-    public void delete(FrequencyY object);
+    public void delete(AccelDataT2 object);
 
-    @Query("SELECT * FROM FrequencyY WHERE username = :username")
-    public FrequencyY getFrequencyY(String username);
+    @Query("SELECT * FROM AccelDataT2 WHERE username = :username")
+    public AccelDataT2 getAccelData(String username);
 }

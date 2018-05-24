@@ -19,9 +19,9 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import cityu.csfyp.tychan289.gestureauthentication.AppDatabase.AppDatabase;
-import cityu.csfyp.tychan289.gestureauthentication.roomEntity.AccelDataX;
-import cityu.csfyp.tychan289.gestureauthentication.roomEntity.AccelDataY;
-import cityu.csfyp.tychan289.gestureauthentication.roomEntity.AccelDataZ;
+import cityu.csfyp.tychan289.gestureauthentication.roomEntity.AccelDataT1;
+import cityu.csfyp.tychan289.gestureauthentication.roomEntity.AccelDataT2;
+import cityu.csfyp.tychan289.gestureauthentication.roomEntity.AccelDataT3;
 
 public class RegisterActivity extends AppCompatActivity implements SensorEventListener {
 
@@ -42,14 +42,14 @@ public class RegisterActivity extends AppCompatActivity implements SensorEventLi
     private double data_values[] = new double[3];
     private boolean timerRunning = false;
     private ArrayList data_x = new ArrayList();
-    private ArrayList data_y = new ArrayList();
+    private ArrayList data_t = new ArrayList();
     private ArrayList data_z = new ArrayList();
     private int trial = 1;
-    private AccelDataX accelDataX;
-    private AccelDataY accelDataY;
-    private AccelDataZ accelDataZ;
-    private double history, current, change;
-    private boolean start_b = false;
+    private AccelDataT1 accelDataT1;
+    private AccelDataT2 accelDataT2;
+    private AccelDataT3 accelDataT3;
+    private double totalAccel;
+    private boolean recording = false;
 
     //Constant
     private static final char x_type = 'x';
@@ -59,6 +59,7 @@ public class RegisterActivity extends AppCompatActivity implements SensorEventLi
     private static final String start = "START";
     private static final String stop = "STOP";
     private static final String data_s = "DATA";
+    private final double alpha = 0.05 / 0.06; //0.833...
 
     //Database
     AppDatabase db;
@@ -100,7 +101,7 @@ public class RegisterActivity extends AppCompatActivity implements SensorEventLi
         if (timerRunning) {
             stopTimer();
             toggle_button.setText(start);
-            if (trial > trainingLimit){
+            if (trial > trainingLimit) {
                 //Prompt login page when finish training
                 Intent intent = new Intent(this, LoginActivity.class);
                 intent.putExtra("username_input", username);
@@ -113,12 +114,12 @@ public class RegisterActivity extends AppCompatActivity implements SensorEventLi
     }
 
     /*TODO: Program Flow
-    * Determine starting point
-    * Record acceleration data
-    * Store data / extract data
-    * Dynamic Time Warping(data)
-    * Identify movement directions & time spent
-    * */
+     * Determine starting point
+     * Record acceleration data
+     * Store data / extract data
+     * Dynamic Time Warping(data)
+     * Identify movement directions & time spent
+     * */
     //TODO: Evaluation
 
     //Timer to record the sensor data per 10ms
@@ -129,17 +130,20 @@ public class RegisterActivity extends AppCompatActivity implements SensorEventLi
         timer = new Timer();
         timer.schedule(new TimerTask() {
             public void run() {
-                if (start_b){
-                    data_x.add(data_values[0]);
-                    data_y.add(data_values[1]);
-                    data_z.add(data_values[2]);
+                totalAccel = Math.sqrt(linear_acceleration[0] * linear_acceleration[0] + linear_acceleration[1] * linear_acceleration[1] + linear_acceleration[2] * linear_acceleration[2]);
+                if (recording) {
+                    data_x.add(linear_acceleration[0]);
+                    data_z.add(linear_acceleration[2]);
+                    data_t.add(totalAccel);
+                    Log.i(data_s, linear_acceleration[0] + ", " + linear_acceleration[2] + ", " + totalAccel);
                 } else {
-                    if (change > 0.15) {
-                        start_b = true;
+                    if (totalAccel > 0.85) {
                         Log.i(data_s, "Start recording data...");
-                        data_x.add(data_values[0]);
-                        data_y.add(data_values[1]);
-                        data_z.add(data_values[2]);
+                        data_x.add(linear_acceleration[0]);
+                        data_z.add(linear_acceleration[2]);
+                        data_t.add(totalAccel);
+                        recording = true;
+                        Log.i(data_s, linear_acceleration[0] + ", " + linear_acceleration[2] + ", " + totalAccel);
                     }
                 }
             }
@@ -151,52 +155,39 @@ public class RegisterActivity extends AppCompatActivity implements SensorEventLi
         timer.cancel();
         timer.purge();
         Log.i("TIMER", "Stop timer...");
-
-        accelDataX = new AccelDataX(username, TypeConvertors.ArrayListDoubletoString(data_x));
-        accelDataY = new AccelDataY(username, TypeConvertors.ArrayListDoubletoString(data_y));
-        accelDataZ = new AccelDataZ(username, TypeConvertors.ArrayListDoubletoString(data_z));
-
-        db.accelDataXDao().insert(accelDataX);
-        db.accelDataYDao().insert(accelDataY);
-        db.accelDataZDao().insert(accelDataZ);
-
-        //Turn data into frequency objects
-//        if (trial == 1) {
-//            frequencyX = (FrequencyX) Classification.classify(data_x, x_type, username);
-//            frequencyY = (FrequencyY) Classification.classify(data_y, y_type, username);
-//            frequencyZ = (FrequencyZ) Classification.classify(data_z, z_type, username);
-//        } else {
-//            frequencyX = (FrequencyX) Classification.classify(data_x, x_type, username, frequencyX);
-//            frequencyY = (FrequencyY) Classification.classify(data_y, y_type, username, frequencyY);
-//            frequencyZ = (FrequencyZ) Classification.classify(data_z, z_type, username, frequencyZ);
-//            if (trial == trainingLimit) {
-//                //Delete old if exists
-//                if (db.frequencyXDao().getFrequencyX(username) != null){
-//                    FrequencyX oldX = db.frequencyXDao().getFrequencyX(username);
-//                    db.frequencyXDao().delete(oldX);
-//                    FrequencyY oldY = db.frequencyYDao().getFrequencyY(username);
-//                    db.frequencyYDao().delete(oldY);
-//                    FrequencyZ oldZ = db.frequencyZDao().getFrequencyZ(username);
-//                    db.frequencyZDao().delete(oldZ);
-//                }
-//                db.frequencyXDao().insert(frequencyX);
-//                db.frequencyYDao().insert(frequencyY);
-//                db.frequencyZDao().insert(frequencyZ);
-//            }
-//        }
-
         Log.i("TRIAL", "Finished trial " + trial);
+
+        //Record three trials respectively
+        switch (trial) {
+            case 1:
+                accelDataT1 = new AccelDataT1(username, (ArrayList<Double>) data_x.clone(), (ArrayList<Double>) data_z.clone(), (ArrayList<Double>) data_t.clone());
+                break;
+            case 2:
+                accelDataT2 = new AccelDataT2(username, (ArrayList<Double>) data_x.clone(), (ArrayList<Double>) data_z.clone(), (ArrayList<Double>) data_t.clone());
+                break;
+            case 3:
+                accelDataT3 = new AccelDataT3(username, (ArrayList<Double>) data_x.clone(), (ArrayList<Double>) data_z.clone(), (ArrayList<Double>) data_t.clone());
+                break;
+        }
 
         //Clear stored data
         data_x.clear();
-        data_y.clear();
         data_z.clear();
+        data_t.clear();
 
         trial++;
         if (trial == trainingLimit) {
             instruction4.setText("");
         }
+
+        //Finish all trials
+        if (trial > trainingLimit) {
+            db.accelDataT1Dao().insert(accelDataT1);
+            db.accelDataT2Dao().insert(accelDataT2);
+            db.accelDataT3Dao().insert(accelDataT3);
+        }
         timerRunning = false;
+        recording = false;
     }
 
     //Sensor is non-stop loading acceleration data
@@ -207,13 +198,6 @@ public class RegisterActivity extends AppCompatActivity implements SensorEventLi
         // with t, the low-pass filter's time-constant t = 0.05
         // and dT, the event delivery rate = 0.01s (10ms)
 
-        history = current;
-        current = Math.sqrt(event.values[0] * event.values[0] + event.values[1] * event.values[1] + event.values[2] * event.values[2]);
-        change = Math.abs(history - current);
-//        Log.i("Vector Change", Double.ArrayListDoubletoString(change));
-
-        final double alpha = 0.05 / 0.06; //0.833...
-
         gravity[0] = alpha * gravity[0] + (1 - alpha) * event.values[0]; //0 + (1 - alpha) * acceleration
         gravity[1] = alpha * gravity[1] + (1 - alpha) * event.values[1];
         gravity[2] = alpha * gravity[2] + (1 - alpha) * event.values[2];
@@ -222,9 +206,11 @@ public class RegisterActivity extends AppCompatActivity implements SensorEventLi
         linear_acceleration[1] = event.values[1] - gravity[1];
         linear_acceleration[2] = event.values[2] - gravity[2];
 
-        data_values[0] = event.values[0];
-        data_values[1] = event.values[1];
-        data_values[2] = event.values[2];
+//        data_values[0] = event.values[0];
+//        data_values[1] = event.values[1];
+//        data_values[2] = event.values[2];
+
+        //Log.i(data_s, "x/" + event.values[0] + ", y/" + event.values[1] + ", z/" + event.values[2]);
     }
 
     /* Unused method */

@@ -12,7 +12,6 @@ public class DynamicTimeWarping {
     public static double run(ArrayList<Double> template, ArrayList<Double> sample) {
         final int length_t = template.size();
         final int length_s = sample.size();
-        //window_size = Math.max(window_size, Math.abs(length_t - length_s));
 
         //Check if input size is zero
         if (length_t == 0 || length_s == 0) {
@@ -53,7 +52,7 @@ public class DynamicTimeWarping {
         //Add all the minimum values
         int i = length_t - 1;
         int j = length_s - 1;
-        double result = dist_g[i + 1][j + 1];
+        double result = dist_g[i][j];
 
         while (i > 0 && j > 0) {
             double backward = dist_g[i - 1][j];

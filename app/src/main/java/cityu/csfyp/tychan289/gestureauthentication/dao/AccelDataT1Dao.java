@@ -7,19 +7,19 @@ import android.arch.persistence.room.OnConflictStrategy;
 import android.arch.persistence.room.Query;
 import android.arch.persistence.room.Update;
 
-import cityu.csfyp.tychan289.gestureauthentication.roomEntity.AccelDataX;
+import cityu.csfyp.tychan289.gestureauthentication.roomEntity.AccelDataT1;
 
 @Dao
-public interface AccelDataXDao {
+public interface AccelDataT1Dao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    public void insert(AccelDataX object);
+    public void insert(AccelDataT1 object);
 
     @Update
-    public void update(AccelDataX object);
+    public void update(AccelDataT1 object);
 
     @Delete
-    public void delete(AccelDataX object);
+    public void delete(AccelDataT1 object);
 
-    @Query("SELECT * FROM AccelDataX WHERE username = :username")
-    public AccelDataX getAccelData(String username);
+    @Query("SELECT * FROM AccelDataT1 WHERE username = :username")
+    public AccelDataT1 getAccelData(String username);
 }

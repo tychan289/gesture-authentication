@@ -11,9 +11,9 @@ import java.util.ArrayList;
  */
 
 @Entity(indices = {@Index(value = {"username"}, unique = true)})
-public class AccelDataY extends AccelData {
-    public AccelDataY(String username, String data) {
-        super(username, data);
+public class AccelDataT2 extends AccelData {
+    public AccelDataT2(String username, ArrayList<Double> data_x, ArrayList<Double> data_z, ArrayList<Double> data_t) {
+        super(username, data_x, data_z, data_t);
     }
 
     @PrimaryKey(autoGenerate = true)
