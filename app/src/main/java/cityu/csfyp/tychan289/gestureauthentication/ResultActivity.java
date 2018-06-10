@@ -27,10 +27,14 @@ public class ResultActivity extends AppCompatActivity {
 
         //Change welcoming text from intent
         Intent intent = getIntent();
-        String r = intent.getStringExtra("result");
-        setResultText(r);
+        boolean r = intent.getBooleanExtra("result", false);
+        if (r){
+            setResultText(getResources().getString(R.string.success));
+        } else {
+            setResultText(getResources().getString(R.string.fail));
+        }
 
-        String d = intent.getStringExtra("distance");
+        String d = intent.getStringExtra("reason");
         setDistText(d);
     }
 
