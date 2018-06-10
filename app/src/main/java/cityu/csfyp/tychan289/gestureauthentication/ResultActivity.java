@@ -19,7 +19,7 @@ public class ResultActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_result);
-        setTitle("Result");
+        setTitle(R.string.result);
 
         //Get views of activity_register
         result_text = (TextView) findViewById(R.id.result_result);

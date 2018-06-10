@@ -39,11 +39,10 @@ public class RegisterActivity extends AppCompatActivity implements SensorEventLi
     String username;
     private double gravity[] = new double[3];
     private double linear_acceleration[] = new double[3];
-    private double data_values[] = new double[3];
     private boolean timerRunning = false;
-    private ArrayList data_x = new ArrayList();
-    private ArrayList data_t = new ArrayList();
-    private ArrayList data_z = new ArrayList();
+    private ArrayList<Double> data_x = new ArrayList<>();
+    private ArrayList<Double> data_t = new ArrayList<>();
+    private ArrayList<Double> data_z = new ArrayList<>();
     private int trial = 1;
     private AccelDataT1 accelDataT1;
     private AccelDataT2 accelDataT2;
@@ -52,13 +51,7 @@ public class RegisterActivity extends AppCompatActivity implements SensorEventLi
     private boolean recording = false;
 
     //Constant
-    private static final char x_type = 'x';
-    private static final char y_type = 'y';
-    private static final char z_type = 'z';
     private static final int trainingLimit = 3;
-    private static final String start = "START";
-    private static final String stop = "STOP";
-    private static final String data_s = "DATA";
     private final double alpha = 0.05 / 0.06; //0.833...
 
     //Database
@@ -68,7 +61,7 @@ public class RegisterActivity extends AppCompatActivity implements SensorEventLi
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
-        setTitle("Registration");
+        setTitle(R.string.registration);
 
         //Get views of activity_register
         welcome_text = (TextView) findViewById(R.id.welcome);
@@ -93,14 +86,14 @@ public class RegisterActivity extends AppCompatActivity implements SensorEventLi
     }
 
     private void welcome(String username) {
-        welcome_text.setText("Welcome \n" + username);
+        welcome_text.setText(String.format(getResources().getString(R.string.welcome_user), username));
     }
 
     //Toggle timer
     public void toggleTimer(View v) {
         if (timerRunning) {
             stopTimer();
-            toggle_button.setText(start);
+            toggle_button.setText(R.string.start);
             if (trial > trainingLimit) {
                 //Prompt login page when finish training
                 Intent intent = new Intent(this, LoginActivity.class);
@@ -109,18 +102,9 @@ public class RegisterActivity extends AppCompatActivity implements SensorEventLi
             }
         } else {
             startTimer();
-            toggle_button.setText(stop);
+            toggle_button.setText(R.string.stop);
         }
     }
-
-    /*TODO: Program Flow
-     * Determine starting point
-     * Record acceleration data
-     * Store data / extract data
-     * Dynamic Time Warping(data)
-     * Identify movement directions & time spent
-     * */
-    //TODO: Evaluation
 
     //Timer to record the sensor data per 10ms
     private void startTimer() {
@@ -129,21 +113,22 @@ public class RegisterActivity extends AppCompatActivity implements SensorEventLi
         Log.i("TIMER", "Start timer...");
         timer = new Timer();
         timer.schedule(new TimerTask() {
-            public void run() {
-                totalAccel = Math.sqrt(linear_acceleration[0] * linear_acceleration[0] + linear_acceleration[1] * linear_acceleration[1] + linear_acceleration[2] * linear_acceleration[2]);
+            public void run() {//+ linear_acceleration[1] * linear_acceleration[1]
+                totalAccel = Math.sqrt(linear_acceleration[0] * linear_acceleration[0] + linear_acceleration[2] * linear_acceleration[2]);
                 if (recording) {
                     data_x.add(linear_acceleration[0]);
                     data_z.add(linear_acceleration[2]);
                     data_t.add(totalAccel);
-                    Log.i(data_s, linear_acceleration[0] + ", " + linear_acceleration[2] + ", " + totalAccel);
+                    //Log.i(getResources().getString(R.string.data), linear_acceleration[0] + ", " + linear_acceleration[2] + ", " + totalAccel);
                 } else {
-                    if (totalAccel > 0.85) {
-                        Log.i(data_s, "Start recording data...");
+                    if (totalAccel > 0.825) {
+                        Log.i(getResources().getString(R.string.data), "Start recording data...");
                         data_x.add(linear_acceleration[0]);
                         data_z.add(linear_acceleration[2]);
                         data_t.add(totalAccel);
+
                         recording = true;
-                        Log.i(data_s, linear_acceleration[0] + ", " + linear_acceleration[2] + ", " + totalAccel);
+                        //Log.i(getResources().getString(R.string.data), linear_acceleration[0] + ", " + linear_acceleration[2] + ", " + totalAccel);
                     }
                 }
             }
@@ -158,16 +143,26 @@ public class RegisterActivity extends AppCompatActivity implements SensorEventLi
         Log.i("TRIAL", "Finished trial " + trial);
 
         //Record three trials respectively
-        switch (trial) {
-            case 1:
-                accelDataT1 = new AccelDataT1(username, (ArrayList<Double>) data_x.clone(), (ArrayList<Double>) data_z.clone(), (ArrayList<Double>) data_t.clone());
-                break;
-            case 2:
-                accelDataT2 = new AccelDataT2(username, (ArrayList<Double>) data_x.clone(), (ArrayList<Double>) data_z.clone(), (ArrayList<Double>) data_t.clone());
-                break;
-            case 3:
-                accelDataT3 = new AccelDataT3(username, (ArrayList<Double>) data_x.clone(), (ArrayList<Double>) data_z.clone(), (ArrayList<Double>) data_t.clone());
-                break;
+        if (data_x.size() < 300 && trial == 1) {
+            Log.d("SIZE", "Gesture too short!!");
+            welcome_text.setText(R.string.try_again);
+        } else {
+            switch (trial) {
+                case 1:
+                    accelDataT1 = new AccelDataT1(username, (ArrayList<Double>) data_x.clone(), (ArrayList<Double>) data_z.clone(), (ArrayList<Double>) data_t.clone());
+                    trial++;
+                    welcome_text.setText(R.string.trial2);
+                    break;
+                case 2:
+                    accelDataT2 = new AccelDataT2(username, (ArrayList<Double>) data_x.clone(), (ArrayList<Double>) data_z.clone(), (ArrayList<Double>) data_t.clone());
+                    trial++;
+                    welcome_text.setText(R.string.trial3);
+                    break;
+                case 3:
+                    accelDataT3 = new AccelDataT3(username, (ArrayList<Double>) data_x.clone(), (ArrayList<Double>) data_z.clone(), (ArrayList<Double>) data_t.clone());
+                    trial++;
+                    break;
+            }
         }
 
         //Clear stored data
@@ -175,7 +170,6 @@ public class RegisterActivity extends AppCompatActivity implements SensorEventLi
         data_z.clear();
         data_t.clear();
 
-        trial++;
         if (trial == trainingLimit) {
             instruction4.setText("");
         }
@@ -206,11 +200,7 @@ public class RegisterActivity extends AppCompatActivity implements SensorEventLi
         linear_acceleration[1] = event.values[1] - gravity[1];
         linear_acceleration[2] = event.values[2] - gravity[2];
 
-//        data_values[0] = event.values[0];
-//        data_values[1] = event.values[1];
-//        data_values[2] = event.values[2];
-
-        //Log.i(data_s, "x/" + event.values[0] + ", y/" + event.values[1] + ", z/" + event.values[2]);
+        //Log.i(getResources().getString(R.string.data), "x/" + event.values[0] + ", y/" + event.values[1] + ", z/" + event.values[2]);
     }
 
     /* Unused method */
