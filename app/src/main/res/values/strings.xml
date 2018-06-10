@@ -1,0 +1,27 @@
+<resources>
+    <string name="app_name">Gesture Authentication</string>
+    <string name="enter_instruction">Please enter a username</string>
+    <string name="imagine_instruction">1. Imagine there are 4 points in front of you: <br/>
+        Left chest, Right chest, Left hipbone and Right hipbone.</string>
+    <string name="draw_instruction">2. Draw a pattern, move from points to points.</string>
+    <string name="time_instruction">3. Make at least 3 moves, 1 second for each move. </string>
+    <string name="tap_instruction">4. Tap button to start / stop</string>
+    <string name="repeat_instruction">5. Repeat above instructions.</string>
+    <string name="try_again">Please try a longer gesture!!</string>
+
+    <string name="registration">Registration</string>
+    <string name="username">Username</string>
+    <string name="register">Register</string>
+    <string name="login">Login</string>
+    <string name="start">START</string>
+    <string name="stop">STOP</string>
+    <string name="data">DATA</string>
+    <string name="timer">TIMER</string>
+    <string name="welcome_user">Welcome <br/>
+        %1$s</string>
+    <string name="welcome">Welcome</string>
+    <string name="login_result">Login Result</string>
+    <string name="result">Result</string>
+    <string name="trial2">Trial 2</string>
+    <string name="trial3">Trial 3</string>
+</resources>
