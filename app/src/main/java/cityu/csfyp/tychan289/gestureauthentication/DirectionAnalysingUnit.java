@@ -29,14 +29,14 @@ public class DirectionAnalysingUnit {
                 } else {
                     double temp_x = data_x.get(i);
                     double temp_z = data_z.get(i);
-                    if (temp_x > 0.6) {
+                    if (temp_x > 0.7) {
                         right = true;
-                    } else if (temp_x < -0.6) {
+                    } else if (temp_x < -0.7) {
                         left = true;
                     }
-                    if (temp_z > 0.6) {
+                    if (temp_z > 0.7) {
                         top = true;
-                    } else if (temp_z < -0.6) {
+                    } else if (temp_z < -0.7) {
                         bottom = true;
                     }
 

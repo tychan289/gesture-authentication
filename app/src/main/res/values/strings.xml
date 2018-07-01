@@ -24,4 +24,8 @@
     <string name="result">Result</string>
     <string name="trial2">Trial 2</string>
     <string name="trial3">Trial 3</string>
+    <string name="success">Login Success!</string>
+    <string name="fail">Login Failed!</string>
+    <string name="fail_time">Time does not match.</string>
+    <string name="fail_dtw">DTW values do not match.</string>
 </resources>

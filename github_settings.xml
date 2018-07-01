@@ -1,7 +1,5 @@
 <application>
   <component name="GithubSettings">
-    <option name="LOGIN" value="tychan289" />
-    <option name="HOST" value="https://github.com/tychan289/final-fyp" />
-    <option name="AUTH_TYPE" value="BASIC" />
+    <option name="AUTH_TYPE" value="TOKEN" />
   </component>
 </application>

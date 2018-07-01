@@ -19,6 +19,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import cityu.csfyp.tychan289.gestureauthentication.AppDatabase.AppDatabase;
+import cityu.csfyp.tychan289.gestureauthentication.roomEntity.AccelData;
 import cityu.csfyp.tychan289.gestureauthentication.roomEntity.AccelDataT1;
 import cityu.csfyp.tychan289.gestureauthentication.roomEntity.AccelDataT2;
 import cityu.csfyp.tychan289.gestureauthentication.roomEntity.AccelDataT3;
@@ -112,11 +113,15 @@ public class LoginActivity extends AppCompatActivity implements SensorEventListe
             //Prompt result page
             Intent intent = new Intent(this, ResultActivity.class);
             if (result) {
-                intent.putExtra("result", "Login success!");
+                intent.putExtra("result", true);
             } else {
-                intent.putExtra("result", "Login fail!");
+                if (distanceX == DTWthreshold) {
+                    intent.putExtra("reason", getResources().getString(R.string.fail_time));
+                } else {
+                    intent.putExtra("reason", getResources().getString(R.string.fail_dtw));
+                }
             }
-            intent.putExtra("distance", "x/" + distanceX + "\n z/" + distanceZ + "\n t/" + distanceT);
+
             startActivity(intent);
         } else {
             startTimer();
@@ -149,7 +154,7 @@ public class LoginActivity extends AppCompatActivity implements SensorEventListe
                         data_z.add(linear_acceleration[2]);
                         data_t.add(totalAccel);
                         recording = true;
-                      //  Log.i(data_s, linear_acceleration[0] + ", " + linear_acceleration[2] + ", " + totalAccel);
+                        //  Log.i(data_s, linear_acceleration[0] + ", " + linear_acceleration[2] + ", " + totalAccel);
                     }
                 }
             }
@@ -165,10 +170,12 @@ public class LoginActivity extends AppCompatActivity implements SensorEventListe
         if (data_x.size() == 0){
             return;
         }
+
+        Log.d("DIRECTIONS", DirectionAnalysingUnit.run(new AccelData("Login Attempt", data_x, data_z, data_t)));
         //Compare the overall time with average time of the three training data
         double avg_time = (accelDataT1.getData_x().size() + accelDataT2.getData_x().size() + accelDataT3.getData_x().size()) / 3;
         double diff = Math.abs(avg_time - data_x.size()) / avg_time;
-        Log.i("INFO", "Average time: " + avg_time + ", time difference = " + (Math.abs(avg_time - data_x.size())) + ", difference in percentage = " + diff);
+        Log.i("INFO", "Average time: " + avg_time + ", time difference = " + (Math.abs(avg_time - data_x.size())) + ", difference = " + diff);
 
         //Use Dynamic Time Warping to find distance if the average time of training data is similar to test data
         if (diff < 0.15) {
@@ -177,7 +184,7 @@ public class LoginActivity extends AppCompatActivity implements SensorEventListe
             distanceZ = DynamicTimeWarping.run(accelDataT1.getData_z(), data_z);
             distanceT = DynamicTimeWarping.run(accelDataT1.getData_t(), data_t);
             result = this.validateLogin(distanceX, distanceZ, distanceT);
-            Log.d("DEBUG", "DTW Score x y z for T1:" + distanceX + ", " + distanceZ + ", " + distanceT + ", result is " + result);
+            Log.d("DEBUG", "DTW Score x z t for T1:" + distanceX + ", " + distanceZ + ", " + distanceT + ", result is " + result);
 
             //Compare training data 2
             if (!result) {
@@ -185,7 +192,7 @@ public class LoginActivity extends AppCompatActivity implements SensorEventListe
                 distanceZ = DynamicTimeWarping.run(accelDataT2.getData_z(), data_z);
                 distanceT = DynamicTimeWarping.run(accelDataT2.getData_t(), data_t);
                 result = this.validateLogin(distanceX, distanceZ, distanceT);
-                Log.d("DEBUG", "DTW Score x y z for T2:" + distanceX + ", " + distanceZ + ", " + distanceT + ", result is " + result);
+                Log.d("DEBUG", "DTW Score x z t for T2:" + distanceX + ", " + distanceZ + ", " + distanceT + ", result is " + result);
             }
 
             //Compare training data 3
@@ -194,7 +201,7 @@ public class LoginActivity extends AppCompatActivity implements SensorEventListe
                 distanceZ = DynamicTimeWarping.run(accelDataT3.getData_z(), data_z);
                 distanceT = DynamicTimeWarping.run(accelDataT3.getData_t(), data_t);
                 result = this.validateLogin(distanceX, distanceZ, distanceT);
-                Log.d("DEBUG", "DTW Score x y z for T3:" + distanceX + ", " + distanceZ + ", " + distanceT + ", result is " + result);
+                Log.d("DEBUG", "DTW Score x z t for T3:" + distanceX + ", " + distanceZ + ", " + distanceT + ", result is " + result);
             }
 
 //            if (result) {
