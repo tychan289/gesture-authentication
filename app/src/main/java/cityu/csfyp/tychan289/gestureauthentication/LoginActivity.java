@@ -154,7 +154,7 @@ public class LoginActivity extends AppCompatActivity implements SensorEventListe
                         data_z.add(linear_acceleration[2]);
                         data_t.add(totalAccel);
                         recording = true;
-                      //  Log.i(data_s, linear_acceleration[0] + ", " + linear_acceleration[2] + ", " + totalAccel);
+                        //  Log.i(data_s, linear_acceleration[0] + ", " + linear_acceleration[2] + ", " + totalAccel);
                     }
                 }
             }
